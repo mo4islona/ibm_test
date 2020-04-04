@@ -11,28 +11,31 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserDto } from './user.dto';
-import { UserEntity } from './user.entity';
+import { UserEntity, UserEntityRelation } from './user.entity';
 import { ApiTags } from '@nestjs/swagger';
 
 @Controller('users')
 @ApiTags('Users')
 @UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
+  users: UserEntity[]
+
   constructor(
     @Inject(UsersService)
     private readonly usersService: UsersService,
-  ) {}
+  ) {
+  }
 
   @Get()
   async list(): Promise<UserEntity[]> {
-    return await this.usersService.findAll();
+    return await this.usersService.findAll([UserEntityRelation.Organization]);
   }
 
   @Get(':id')
-  async one(@Param('id') id: string): Promise<UserEntity> {
+  async one(@Param('id') id: number): Promise<UserEntity> {
     return await this.usersService.findOneElseThrow(id, [
-      'organization',
-      'roles',
+      UserEntityRelation.Organization,
+      UserEntityRelation.Roles,
     ]);
   }
 
@@ -42,7 +45,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string): Promise<UserEntity> {
+  async delete(@Param('id') id: number): Promise<UserEntity> {
     return await this.usersService.remove(id);
   }
 }

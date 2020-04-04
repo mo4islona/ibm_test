@@ -3,18 +3,12 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { useContainer } from 'class-validator';
+import { Cluster } from './cluster';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
-  app.useGlobalPipes(
-    new ValidationPipe({
-      validationError: {
-        target: false,
-        value: false,
-      },
-    }),
-  );
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   const options = new DocumentBuilder()
     .setTitle('API docs')
@@ -28,4 +22,9 @@ async function bootstrap() {
   await app.listen(8080);
 }
 
-bootstrap();
+
+if(process.env.NODE_ENV === 'production') {
+  Cluster.run(bootstrap);
+} else {
+  bootstrap()
+}
