@@ -18,13 +18,12 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags('Users')
 @UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
-  users: UserEntity[]
+  users: UserEntity[];
 
   constructor(
     @Inject(UsersService)
     private readonly usersService: UsersService,
-  ) {
-  }
+  ) {}
 
   @Get()
   async list(): Promise<UserEntity[]> {

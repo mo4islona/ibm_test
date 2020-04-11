@@ -1,5 +1,5 @@
 import * as cluster from 'cluster';
-import * as os from 'os'
+import * as os from 'os';
 import { Logger } from '@nestjs/common';
 
 const numCPUs = os.cpus().length;

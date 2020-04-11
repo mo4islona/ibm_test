@@ -22,9 +22,8 @@ async function bootstrap() {
   await app.listen(8080);
 }
 
-
-if(process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'production') {
   Cluster.run(bootstrap);
 } else {
-  bootstrap()
+  bootstrap();
 }

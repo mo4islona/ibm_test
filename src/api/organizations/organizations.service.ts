@@ -7,7 +7,9 @@ import { OrganizationEntity } from './organization.entity';
 export class OrganizationsService {
   constructor(
     @InjectRepository(OrganizationEntity)
-    private readonly organizationEntityRepository: Repository<OrganizationEntity>,
+    private readonly organizationEntityRepository: Repository<
+      OrganizationEntity
+    >,
   ) {}
 
   async findOrCreate(name: string): Promise<OrganizationEntity> {
