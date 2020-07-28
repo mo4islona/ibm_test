@@ -1,13 +1,12 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UserEntity } from './user.entity';
+import { hash, genSalt } from 'bcrypt';
+import { UserEntity, UserEntityRelation } from './user.entity';
 import { UserDto } from './user.dto';
 import { OrganizationsService } from '../organizations/organizations.service';
-import { RolesService } from '../roles/roles.service';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const bcrypt = require('bcrypt');
+import { RolesService } from '../roles/roles.service';
 
 @Injectable()
 export class UsersService {
@@ -21,8 +20,8 @@ export class UsersService {
   ) {}
 
   async findOneElseThrow(
-    id: string,
-    relations?: string[],
+    id: number,
+    relations?: UserEntityRelation[],
   ): Promise<UserEntity> {
     const user = await this.userEntityRepository.findOne({
       where: { id },
@@ -33,8 +32,10 @@ export class UsersService {
     return user;
   }
 
-  findAll(): Promise<UserEntity[]> {
-    return this.userEntityRepository.find({ relations: ['organization'] });
+  findAll(relations?: UserEntityRelation[]): Promise<UserEntity[]> {
+    return this.userEntityRepository.find({
+      relations,
+    });
   }
 
   async addOne(req: UserDto): Promise<UserEntity> {
@@ -48,14 +49,17 @@ export class UsersService {
     user.organization = org;
     user.roles = roles;
 
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(user.password, salt);
+    const salt = await genSalt(10);
+    user.password = await hash(user.password, salt);
 
     return this.userEntityRepository.save(user);
   }
 
-  async remove(id: string): Promise<UserEntity> {
-    const user = await this.findOneElseThrow(id, ['organization', 'roles']);
+  async remove(id: number): Promise<UserEntity> {
+    const user = await this.findOneElseThrow(id, [
+      UserEntityRelation.Organization,
+      UserEntityRelation.Roles,
+    ]);
     await this.userEntityRepository.delete(user.id);
 
     return user;

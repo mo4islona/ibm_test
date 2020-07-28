@@ -33,10 +33,7 @@ export class UserEntity {
   @Column({ nullable: false })
   organizationId: number;
 
-  @ManyToOne(
-    () => OrganizationEntity,
-    o => o.users,
-  )
+  @ManyToOne(() => OrganizationEntity, (o) => o.users)
   @JoinColumn()
   organization: OrganizationEntity;
 
@@ -47,4 +44,9 @@ export class UserEntity {
   constructor(partial?: Partial<UserEntity | UserDto>) {
     Object.assign(this, partial);
   }
+}
+
+export enum UserEntityRelation {
+  Roles = 'roles',
+  Organization = 'organization',
 }
